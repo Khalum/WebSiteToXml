@@ -2,10 +2,10 @@ package de.rutz.kanji;
 
 import java.util.List;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -15,19 +15,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 //@XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 public class Kanji {
-	
+
 	@Id
 	@GeneratedValue
 	int id;
 	String character;
-	//@XmlElementWrapper(name = "meanings")
-	@OneToMany(mappedBy="kanji")
+	// @XmlElementWrapper(name = "meanings")
+	@ElementCollection
 	List<String> meaning;
-	//@XmlElementWrapper(name = "onyomis")
-	@OneToMany(mappedBy="kanji")
+	// @XmlElementWrapper(name = "onyomis")
+	@ElementCollection
 	List<String> onyomi;
-	//@XmlElementWrapper(name = "kunyomis")
-	@OneToMany(mappedBy="kanji")
+	// @XmlElementWrapper(name = "kunyomis")
+	@ElementCollection
 	List<String> kunyomi;
 	int jlptLevel;
 	String strokeOrderSVG;
@@ -35,11 +35,11 @@ public class Kanji {
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
-	
+
 	public int getJlptLevel() {
 		return jlptLevel;
 	}
@@ -79,11 +79,11 @@ public class Kanji {
 	public void setKunyomi(List<String> kunyomi) {
 		this.kunyomi = kunyomi;
 	}
-	
+
 	public String getStrokeOrderSVG() {
 		return strokeOrderSVG;
 	}
-	
+
 	public void setStrokeOrderSVG(String strokeOrderSVG) {
 		this.strokeOrderSVG = strokeOrderSVG;
 	}

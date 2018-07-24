@@ -5,7 +5,7 @@
       xmlns="http://java.sun.com/xml/ns/persistence">
     <persistence-unit name="japanesevocab" transaction-type="RESOURCE_LOCAL">
       <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-      <class>de.rutz.kanji</class>
+      <class>de.rutz.kanji.Kanji</class>
       <properties>
         <property name="javax.persistence.jdbc.driver" value="org.sqlite.JDBC" />
         <property name="javax.persistence.jdbc.url" value="jdbc:sqlite:D:/Users/Nikolai/Documents/Programmierung/Java/WebSiteToXml/japanesevocab.db" />

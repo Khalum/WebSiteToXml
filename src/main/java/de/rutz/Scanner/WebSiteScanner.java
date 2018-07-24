@@ -2,7 +2,6 @@ package de.rutz.Scanner;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,10 +16,19 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jsoup.Connection;
+import org.jsoup.Connection.Method;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxBinary;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 
 import de.rutz.kanji.JapaneseVocab;
 import de.rutz.kanji.Kanji;
@@ -29,6 +37,9 @@ public class WebSiteScanner {
 	private String website;
 	private JapaneseVocab japaneseVocab;
 	private List<Kanji> kanjiList = new ArrayList<Kanji>();
+	private WebDriver driver=null;
+//	private String savedURL=null;
+//	private String session_id=null;
 
 	public WebSiteScanner(Map<Integer, Integer> map) throws ParserConfigurationException, IOException, JAXBException {
 		japaneseVocab = new JapaneseVocab();
@@ -40,6 +51,7 @@ public class WebSiteScanner {
 		japaneseVocab.setKanji(kanjiList);
 //		writeXML(japaneseVocab);
 		writetoDB(kanjiList);
+		driver.close();
 	}
 
 	private void buildDOM(int level, int page) throws IOException, ParserConfigurationException, JAXBException {
@@ -54,11 +66,16 @@ public class WebSiteScanner {
 			for (Element e : kanjis) {
 				Element kanji = e.child(0);
 				newKanji.setCharacter(kanji.ownText());
-				Document kanjiDoc =Jsoup.connect("https://kanjivg.tagaini.net/viewer.html?kanji="+URLEncoder.encode(kanji.ownText(), "UTF-8")).get();
+				String url ="https://kanjivg.tagaini.net/viewer.html?kanji=";
+				if(driver==null) {
+				System.setProperty("webdriver.edge.driver","D:\\Users\\Nikolai\\Downloads\\MicrosoftWebDriver.exe");
+				driver = new EdgeDriver();
+				}
+				driver.get(url + kanji.ownText());
+				Document kanjiDoc =Jsoup.parse(driver.getPageSource());
 				Element svg=kanjiDoc.getElementById("kanjiViewer");
-				newKanji.setStrokeOrderSVG(svg.text());
-				System.out.println(kanjiDoc);
-				System.out.println(URLEncoder.encode(kanji.ownText(), "UTF-8"));
+				System.out.println(svg);
+				newKanji.setStrokeOrderSVG(svg.html());
 			}
 			Elements meanings = div.getElementsByClass("meanings");
 			List<String> meaningList = new ArrayList<String>();
@@ -116,10 +133,11 @@ public class WebSiteScanner {
 		EntityManager em = factory.createEntityManager();
 		EntityTransaction trans=em.getTransaction();
 		trans.begin();
-		em.persist(kanjiList);
+		for(Kanji kanji: kanjiList) {
+			em.persist(kanji);
+		}
 		trans.commit();
 		em.close();
 		factory.close();
 	}
-
 }
